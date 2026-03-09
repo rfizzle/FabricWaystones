@@ -158,10 +158,10 @@ public class WaystoneBlockEntity extends LootableContainerBlockEntity implements
     @Override
     protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
         super.writeNbt(nbt, lookup);
-        createTag(nbt);
+        createTag(nbt, lookup);
     }
 
-    private NbtCompound createTag(NbtCompound tag) {
+    private NbtCompound createTag(NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup) {
         tag.putString("waystone_name", this.name);
         if (this.owner != null) {
             tag.putUuid("waystone_owner", this.owner);
@@ -174,7 +174,7 @@ public class WaystoneBlockEntity extends LootableContainerBlockEntity implements
             tag.putInt("color", this.color);
         }
         tag.putInt("inventory_size", this.inventory.size());
-        Inventories.writeNbt(tag, this.inventory, world.getRegistryManager());
+        Inventories.writeNbt(tag, this.inventory, registryLookup);
         return tag;
     }
 
