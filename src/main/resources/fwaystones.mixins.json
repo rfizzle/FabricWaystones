@@ -9,6 +9,7 @@
     "ServerPlayerEntityAccessor",
     "ServerPlayerEntityMixin",
     "SinglePoolElementAccessor",
+    "SinglePoolElementMixin",
     "StructurePiecesListMixin",
     "StructurePoolAccessor",
     "StructurePoolBasedGenerator_StructurePoolGeneratorMixin",
