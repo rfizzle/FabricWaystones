@@ -1,25 +1,16 @@
 package wraith.fwaystones.util;
 
-import com.mojang.datafixers.util.Pair;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.Registries;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.structure.pool.StructurePool;
-import net.minecraft.structure.pool.StructurePoolElement;
-import net.minecraft.structure.processor.StructureProcessorList;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import wraith.fwaystones.FabricWaystones;
-import wraith.fwaystones.mixin.StructurePoolAccessor;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -28,14 +19,11 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 public final class Utils {
 
     public static final DecimalFormat df = new DecimalFormat("#.##");
-    public static final Random random = new Random();
-    private static final RegistryKey<StructureProcessorList> EMPTY_PROCESSOR_LIST_KEY = RegistryKey.of(
-        RegistryKeys.PROCESSOR_LIST, Identifier.of("minecraft", "empty"));
 
     private Utils() {
     }
@@ -49,7 +37,7 @@ public final class Utils {
             min = max;
             max = temp;
         }
-        return random.nextInt((max - min) + 1) + min;
+        return ThreadLocalRandom.current().nextInt((max - min) + 1) + min;
     }
 
     public static Identifier ID(String id) {
@@ -61,49 +49,21 @@ public final class Utils {
     }
 
     private static String generateUniqueId() {
-        if (random.nextDouble() < 1e-4) {
+        if (ThreadLocalRandom.current().nextDouble() < 1e-4) {
             return "DeatHunter was here";
         }
         var sb = new StringBuilder();
         char[] vowels = { 'a', 'e', 'i', 'o', 'u' };
         char[] consonants = { 'b', 'c', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'm', 'n', 'p', 'q', 'r', 's', 't', 'v', 'w', 'x', 'y', 'z' };
         for (int i = 0; i < 4; ++i) {
-            var consonant = consonants[Utils.random.nextInt(consonants.length)];
+            var consonant = consonants[ThreadLocalRandom.current().nextInt(consonants.length)];
             if (i == 0) {
                 consonant = Character.toUpperCase(consonant);
             }
             sb.append(consonant);
-            sb.append(vowels[Utils.random.nextInt(vowels.length)]);
+            sb.append(vowels[ThreadLocalRandom.current().nextInt(vowels.length)]);
         }
         return sb.toString();
-    }
-
-    public static void addToStructurePool(MinecraftServer server, Identifier village, Identifier waystone, int weight) {
-
-        RegistryEntry<StructureProcessorList> emptyProcessorList = server.getRegistryManager()
-            .get(RegistryKeys.PROCESSOR_LIST)
-            .entryOf(EMPTY_PROCESSOR_LIST_KEY);
-
-        var poolGetter = server.getRegistryManager()
-            .get(RegistryKeys.TEMPLATE_POOL)
-            .getOrEmpty(village);
-
-        if (poolGetter.isEmpty()) {
-            FabricWaystones.LOGGER.error("Cannot add to " + village + " as it cannot be found!");
-            return;
-        }
-        var pool = poolGetter.get();
-
-        var pieceList = ((StructurePoolAccessor) pool).getElements();
-        var piece = StructurePoolElement.ofProcessedSingle(waystone.toString(), emptyProcessorList).apply(StructurePool.Projection.RIGID);
-
-        var list = new ArrayList<>(((StructurePoolAccessor) pool).getElementCounts());
-        list.add(Pair.of(piece, weight));
-        ((StructurePoolAccessor) pool).setElementCounts(list);
-
-        for (int i = 0; i < weight; ++i) {
-            pieceList.add(piece);
-        }
     }
 
     //Values from https://minecraft.gamepedia.com/Experience
@@ -330,7 +290,7 @@ public final class Utils {
     }
 
     public static int getRandomColor() {
-        return random.nextInt(0xFFFFFF);
+        return ThreadLocalRandom.current().nextInt(0xFFFFFF);
     }
 
     @Nullable

@@ -71,7 +71,7 @@ public abstract class LivingEntityMixin {
                 var discovered = ((PlayerEntityMixinAccess) player).fabricWaystones$getDiscoveredWaystones();
                 if (!discovered.isEmpty()) {
                     var list = new ArrayList<>(discovered);
-                    hash = list.get(Utils.random.nextInt(list.size()));
+                    hash = list.get(java.util.concurrent.ThreadLocalRandom.current().nextInt(list.size()));
                 }
             }
             if (hash != null) {

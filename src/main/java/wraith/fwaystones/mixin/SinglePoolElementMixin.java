@@ -18,17 +18,17 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wraith.fwaystones.FabricWaystones;
 
-import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Mixin(SinglePoolElement.class)
 public abstract class SinglePoolElementMixin {
 
     @Unique
-    private static final Set<BlockPos> fabricWaystones$generatedPositions = new HashSet<>();
+    private static final Set<BlockPos> fabricWaystones$generatedPositions = ConcurrentHashMap.newKeySet();
 
     @Unique
-    private Boolean fabricWaystones$isWaystone;
+    private volatile Boolean fabricWaystones$isWaystone;
 
     @Unique
     private boolean fabricWaystones$checkIsWaystone() {
@@ -36,7 +36,7 @@ public abstract class SinglePoolElementMixin {
             fabricWaystones$isWaystone = ((SinglePoolElementAccessor) this)
                 .getLocation()
                 .left()
-                .map(id -> id.getNamespace().equals(FabricWaystones.MOD_ID))
+                .map(id -> id.getNamespace().equals(FabricWaystones.MOD_ID) || id.getNamespace().equals("waystones"))
                 .orElse(false);
         }
         return fabricWaystones$isWaystone;
@@ -58,13 +58,13 @@ public abstract class SinglePoolElementMixin {
         // Check if another waystone was already placed nearby (same village)
         for (BlockPos existingPos : fabricWaystones$generatedPositions) {
             if (pos != existingPos && existingPos.getSquaredDistance(pos) < 100 * 100) {
-                FabricWaystones.LOGGER.info("[FWaystones] Prevented duplicate waystone at {} (too close to existing at {})", pos, existingPos);
+                FabricWaystones.LOGGER.debug("[FWaystones] Prevented duplicate waystone at {} (too close to existing at {})", pos, existingPos);
                 cir.setReturnValue(false);
                 return;
             }
         }
 
         fabricWaystones$generatedPositions.add(pos);
-        FabricWaystones.LOGGER.info("[FWaystones] Placing waystone at {}", pos);
+        FabricWaystones.LOGGER.debug("[FWaystones] Placing waystone at {}", pos);
     }
 }

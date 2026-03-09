@@ -12,6 +12,7 @@
     "sources": "https://github.com/LordDeatHunter/FabricWaystones",
     "issues": "https://github.com/LordDeatHunter/FabricWaystones/issues"
   },
+  "provides": ["waystones"],
   "license": "MIT License",
   "icon": "assets/fwaystones/fabric_waystones_icon.png",
   "environment": "*",
